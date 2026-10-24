@@ -1,0 +1,138 @@
+/* GLSL Studio Theme — Nord */
+
+editor {
+    bg: #2e3440;
+    fg: #d8dee9;
+    cursor: #88c0d0;
+    selection: #3b4252;
+    line-highlight: #3b4252;
+    font-size: 14;
+    line-height: 20;
+}
+
+gutter {
+    bg: #2e3440;
+    fg: #81a1c1;
+    border: #3b4252;
+    width: 50;
+}
+
+preview {
+    bg: #2e3440;
+    border: #3b4252;
+}
+
+toolbar {
+    bg: #2e3440;
+    fg: #d8dee9;
+    border: #3b4252;
+    height: 30;
+}
+
+status {
+    bg: #2e3440;
+    fg: #d8dee9;
+    error: #bf616a;
+    success: #a3be8c;
+    height: 24;
+}
+
+scrollbar {
+    bg: #2e3440;
+    thumb: #3b4252;
+    width: 12;
+}
+
+syntax.keyword {
+    color: #81a1c1;
+    bold: true;
+}
+
+syntax.type {
+    color: #8fbcbb;
+    italic: true;
+}
+
+syntax.number {
+    color: #b48ead;
+}
+
+syntax.string {
+    color: #a3be8c;
+}
+
+syntax.comment {
+    color: #4c566a;
+    italic: true;
+}
+
+syntax.function {
+    color: #88c0d0;
+}
+
+syntax.preprocessor {
+    color: #81a1c1;
+}
+
+syntax.operator {
+    color: #d8dee9;
+}
+
+syntax.builtin {
+    color: #5e81ac;
+}
+
+syntax.identifier {
+    color: #d8dee9;
+}
+
+syntax.swizzle {
+    color: #ebcb8b;
+}
+
+tab {
+    bg: #3b4252;
+    active-bg: #2e3440;
+    fg: #81a1c1;
+    active-fg: #d8dee9;
+    border: #3b4252;
+    height: 28;
+}
+
+node {
+    bg: #3b4252;
+    header: #434c5e;
+    fg: #eceff4;
+    border: #4c566a;
+    selection: #ebcb8b;
+    shadow: #000000;
+    grid-bg: #242933;
+    grid-line: #2a3040;
+    grid-major: #333a4a;
+    border-radius: 6;
+}
+
+menu {
+    bg: #333a4a;
+    fg: #eceff4;
+    hover: #434c5e;
+    border: #4c566a;
+    separator: #3b4252;
+    category: #88c0d0;
+    shortcut: #616e88;
+    shadow: #000000;
+    border-radius: 8;
+}
+
+picker {
+    bg: #2e3440;
+    fg: #eceff4;
+    hover: #434c5e;
+    active: #3b4252;
+    border: #4c566a;
+    border-radius: 10;
+}
+
+ui {
+    border-radius: 4;
+}

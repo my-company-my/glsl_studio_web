@@ -1,0 +1,138 @@
+/* GLSL Studio Theme — Catppuccin Mocha */
+
+editor {
+    bg: #1e1e2e;
+    fg: #cdd6f4;
+    cursor: #f5e0dc;
+    selection: #585b70;
+    line-highlight: #313244;
+    font-size: 14;
+    line-height: 20;
+}
+
+gutter {
+    bg: #181825;
+    fg: #6c7086;
+    border: #313244;
+    width: 50;
+}
+
+preview {
+    bg: #11111b;
+    border: #313244;
+}
+
+toolbar {
+    bg: #181825;
+    fg: #cdd6f4;
+    border: #313244;
+    height: 30;
+}
+
+status {
+    bg: #181825;
+    fg: #a6adc8;
+    error: #f38ba8;
+    success: #a6e3a1;
+    height: 24;
+}
+
+scrollbar {
+    bg: #1e1e2e;
+    thumb: #585b70;
+    width: 12;
+}
+
+syntax.keyword {
+    color: #cba6f7;
+    bold: true;
+}
+
+syntax.type {
+    color: #89dceb;
+    italic: true;
+}
+
+syntax.number {
+    color: #fab387;
+}
+
+syntax.string {
+    color: #a6e3a1;
+}
+
+syntax.comment {
+    color: #6c7086;
+    italic: true;
+}
+
+syntax.function {
+    color: #89b4fa;
+}
+
+syntax.preprocessor {
+    color: #f38ba8;
+}
+
+syntax.operator {
+    color: #94e2d5;
+}
+
+syntax.builtin {
+    color: #f5c2e7;
+}
+
+syntax.identifier {
+    color: #cdd6f4;
+}
+
+syntax.swizzle {
+    color: #f9e2af;
+}
+
+tab {
+    bg: #181825;
+    active-bg: #1e1e2e;
+    fg: #6c7086;
+    active-fg: #cdd6f4;
+    border: #313244;
+    height: 28;
+}
+
+node {
+    bg: #282840;
+    header: #3c3c50;
+    fg: #cdd6f4;
+    border: #454560;
+    selection: #f2bf33;
+    shadow: #000000;
+    grid-bg: #191921;
+    grid-line: #1f1f29;
+    grid-major: #262633;
+    border-radius: 6;
+}
+
+menu {
+    bg: #262633;
+    fg: #d9d9e6;
+    hover: #475980;
+    border: #4d4d66;
+    separator: #404059;
+    category: #99b3d9;
+    shortcut: #a6b3cc;
+    shadow: #000000;
+    border-radius: 8;
+}
+
+picker {
+    bg: #1e1e2e;
+    fg: #cdd6f4;
+    hover: #475980;
+    active: #585b70;
+    border: #313244;
+    border-radius: 10;
+}
+
+ui {
+    border-radius: 4;
+}

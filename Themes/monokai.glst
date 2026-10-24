@@ -1,0 +1,138 @@
+/* GLSL Studio Theme — Monokai */
+
+editor {
+    bg: #272822;
+    fg: #f8f8f2;
+    cursor: #f8f8f0;
+    selection: #49483e;
+    line-highlight: #3e3d32;
+    font-size: 14;
+    line-height: 20;
+}
+
+gutter {
+    bg: #2d2d2d;
+    fg: #75715e;
+    border: #3e3d32;
+    width: 50;
+}
+
+preview {
+    bg: #1a1a1a;
+    border: #3e3d32;
+}
+
+toolbar {
+    bg: #2d2d2d;
+    fg: #f8f8f2;
+    border: #3e3d32;
+    height: 30;
+}
+
+status {
+    bg: #2d2d2d;
+    fg: #a6a28c;
+    error: #f92672;
+    success: #a6e22e;
+    height: 24;
+}
+
+scrollbar {
+    bg: #272822;
+    thumb: #49483e;
+    width: 12;
+}
+
+syntax.keyword {
+    color: #f92672;
+    bold: true;
+}
+
+syntax.type {
+    color: #66d9ef;
+    italic: true;
+}
+
+syntax.number {
+    color: #ae81ff;
+}
+
+syntax.string {
+    color: #e6db74;
+}
+
+syntax.comment {
+    color: #75715e;
+    italic: true;
+}
+
+syntax.function {
+    color: #a6e22e;
+}
+
+syntax.preprocessor {
+    color: #f92672;
+}
+
+syntax.operator {
+    color: #f8f8f2;
+}
+
+syntax.builtin {
+    color: #66d9ef;
+}
+
+syntax.identifier {
+    color: #f8f8f2;
+}
+
+syntax.swizzle {
+    color: #e6db74;
+}
+
+tab {
+    bg: #2d2d2d;
+    active-bg: #272822;
+    fg: #75715e;
+    active-fg: #f8f8f2;
+    border: #3e3d32;
+    height: 28;
+}
+
+node {
+    bg: #353530;
+    header: #4a4a40;
+    fg: #f8f8f2;
+    border: #555548;
+    selection: #e6db74;
+    shadow: #000000;
+    grid-bg: #1a1a16;
+    grid-line: #222220;
+    grid-major: #2d2d28;
+    border-radius: 6;
+}
+
+menu {
+    bg: #2d2d28;
+    fg: #f8f8f2;
+    hover: #49483e;
+    border: #555548;
+    separator: #3e3d32;
+    category: #a6e22e;
+    shortcut: #75715e;
+    shadow: #000000;
+    border-radius: 8;
+}
+
+picker {
+    bg: #272822;
+    fg: #f8f8f2;
+    hover: #49483e;
+    active: #3e3d32;
+    border: #555548;
+    border-radius: 10;
+}
+
+ui {
+    border-radius: 4;
+}

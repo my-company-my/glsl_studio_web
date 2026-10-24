@@ -1,0 +1,138 @@
+/* GLSL Studio Theme — Dracula */
+
+editor {
+    bg: #282a36;
+    fg: #f8f8f2;
+    cursor: #f8f8f0;
+    selection: #44475a;
+    line-highlight: #44475a;
+    font-size: 14;
+    line-height: 20;
+}
+
+gutter {
+    bg: #282a36;
+    fg: #6272a4;
+    border: #44475a;
+    width: 50;
+}
+
+preview {
+    bg: #1e1f29;
+    border: #44475a;
+}
+
+toolbar {
+    bg: #282a36;
+    fg: #f8f8f2;
+    border: #44475a;
+    height: 30;
+}
+
+status {
+    bg: #282a36;
+    fg: #f8f8f2;
+    error: #ff5555;
+    success: #50fa7b;
+    height: 24;
+}
+
+scrollbar {
+    bg: #282a36;
+    thumb: #44475a;
+    width: 12;
+}
+
+syntax.keyword {
+    color: #ff79c6;
+    bold: true;
+}
+
+syntax.type {
+    color: #8be9fd;
+    italic: true;
+}
+
+syntax.number {
+    color: #bd93f9;
+}
+
+syntax.string {
+    color: #f1fa8c;
+}
+
+syntax.comment {
+    color: #6272a4;
+    italic: true;
+}
+
+syntax.function {
+    color: #50fa7b;
+}
+
+syntax.preprocessor {
+    color: #ff79c6;
+}
+
+syntax.operator {
+    color: #f8f8f2;
+}
+
+syntax.builtin {
+    color: #8be9fd;
+}
+
+syntax.identifier {
+    color: #f8f8f2;
+}
+
+syntax.swizzle {
+    color: #f1fa8c;
+}
+
+tab {
+    bg: #44475a;
+    active-bg: #282a36;
+    fg: #6272a4;
+    active-fg: #f8f8f2;
+    border: #44475a;
+    height: 28;
+}
+
+node {
+    bg: #383a59;
+    header: #44475a;
+    fg: #f8f8f2;
+    border: #555577;
+    selection: #f1fa8c;
+    shadow: #000000;
+    grid-bg: #1e1f33;
+    grid-line: #252640;
+    grid-major: #2d2e4a;
+    border-radius: 6;
+}
+
+menu {
+    bg: #2d2e4a;
+    fg: #f8f8f2;
+    hover: #44475a;
+    border: #555577;
+    separator: #383a59;
+    category: #bd93f9;
+    shortcut: #6272a4;
+    shadow: #000000;
+    border-radius: 8;
+}
+
+picker {
+    bg: #282a36;
+    fg: #f8f8f2;
+    hover: #44475a;
+    active: #383a59;
+    border: #555577;
+    border-radius: 10;
+}
+
+ui {
+    border-radius: 4;
+}

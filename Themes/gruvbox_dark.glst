@@ -1,0 +1,138 @@
+/* GLSL Studio Theme — Gruvbox Dark */
+
+editor {
+    bg: #282828;
+    fg: #ebdbb2;
+    cursor: #fbf1c7;
+    selection: #3c3836;
+    line-highlight: #3c3836;
+    font-size: 14;
+    line-height: 20;
+}
+
+gutter {
+    bg: #282828;
+    fg: #928374;
+    border: #3c3836;
+    width: 50;
+}
+
+preview {
+    bg: #1d2021;
+    border: #3c3836;
+}
+
+toolbar {
+    bg: #282828;
+    fg: #ebdbb2;
+    border: #3c3836;
+    height: 30;
+}
+
+status {
+    bg: #282828;
+    fg: #ebdbb2;
+    error: #fb4934;
+    success: #b8bb26;
+    height: 24;
+}
+
+scrollbar {
+    bg: #282828;
+    thumb: #3c3836;
+    width: 12;
+}
+
+syntax.keyword {
+    color: #fb4934;
+    bold: true;
+}
+
+syntax.type {
+    color: #83a598;
+    italic: true;
+}
+
+syntax.number {
+    color: #d3869b;
+}
+
+syntax.string {
+    color: #b8bb26;
+}
+
+syntax.comment {
+    color: #928374;
+    italic: true;
+}
+
+syntax.function {
+    color: #8ec07c;
+}
+
+syntax.preprocessor {
+    color: #fe8019;
+}
+
+syntax.operator {
+    color: #ebdbb2;
+}
+
+syntax.builtin {
+    color: #83a598;
+}
+
+syntax.identifier {
+    color: #ebdbb2;
+}
+
+syntax.swizzle {
+    color: #d79921;
+}
+
+tab {
+    bg: #3c3836;
+    active-bg: #282828;
+    fg: #928374;
+    active-fg: #ebdbb2;
+    border: #3c3836;
+    height: 28;
+}
+
+node {
+    bg: #3c3836;
+    header: #504945;
+    fg: #ebdbb2;
+    border: #665c54;
+    selection: #fabd2f;
+    shadow: #000000;
+    grid-bg: #1d2021;
+    grid-line: #252525;
+    grid-major: #32302f;
+    border-radius: 6;
+}
+
+menu {
+    bg: #32302f;
+    fg: #ebdbb2;
+    hover: #504945;
+    border: #665c54;
+    separator: #3c3836;
+    category: #b8bb26;
+    shortcut: #928374;
+    shadow: #000000;
+    border-radius: 8;
+}
+
+picker {
+    bg: #282828;
+    fg: #ebdbb2;
+    hover: #504945;
+    active: #3c3836;
+    border: #665c54;
+    border-radius: 10;
+}
+
+ui {
+    border-radius: 4;
+}

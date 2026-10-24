@@ -1,0 +1,138 @@
+/* GLSL Studio Theme — High Contrast Refined */
+
+editor {
+    bg: #000000;
+    fg: #F5F7FA;
+    cursor: #FFFFFF;
+    selection: #1F2933;
+    line-highlight: #0F141A;
+    font-size: 14;
+    line-height: 20;
+}
+
+gutter {
+    bg: #000000;
+    fg: #9AA4AF;
+    border: #1F2933;
+    width: 50;
+}
+
+preview {
+    bg: #000000;
+    border: #2A3440;
+}
+
+toolbar {
+    bg: #000000;
+    fg: #F5F7FA;
+    border: #1F2933;
+    height: 30;
+}
+
+status {
+    bg: #000000;
+    fg: #F5F7FA;
+    error: #FF4D4D;
+    success: #00E676;
+    height: 24;
+}
+
+scrollbar {
+    bg: #000000;
+    thumb: #2A3440;
+    width: 12;
+}
+
+syntax.keyword {
+    color: #00E5FF;
+    bold: true;
+}
+
+syntax.type {
+    color: #4FC3F7;
+    italic: true;
+}
+
+syntax.number {
+    color: #FF7BFF;
+}
+
+syntax.string {
+    color: #00FF9C;
+}
+
+syntax.comment {
+    color: #7F8C8D;
+    italic: true;
+}
+
+syntax.function {
+    color: #FFD54F;
+}
+
+syntax.preprocessor {
+    color: #FF7043;
+}
+
+syntax.operator {
+    color: #FFFFFF;
+}
+
+syntax.builtin {
+    color: #B388FF;
+}
+
+syntax.identifier {
+    color: #F5F7FA;
+}
+
+syntax.swizzle {
+    color: #B0BEC5;
+}
+
+tab {
+    bg: #0F141A;
+    active-bg: #000000;
+    fg: #9AA4AF;
+    active-fg: #F5F7FA;
+    border: #1F2933;
+    height: 28;
+}
+
+node {
+    bg: #0F141A;
+    header: #1F2933;
+    fg: #F5F7FA;
+    border: #00E5FF;
+    selection: #FFD54F;
+    shadow: #000000;
+    grid-bg: #05080B;
+    grid-line: #0F141A;
+    grid-major: #1F2933;
+    border-radius: 6;
+}
+
+menu {
+    bg: #0F141A;
+    fg: #F5F7FA;
+    hover: #1F2933;
+    border: #00E5FF;
+    separator: #2A3440;
+    category: #4FC3F7;
+    shortcut: #9AA4AF;
+    shadow: #000000;
+    border-radius: 8;
+}
+
+picker {
+    bg: #000000;
+    fg: #F5F7FA;
+    hover: #1F2933;
+    active: #2A3440;
+    border: #00E5FF;
+    border-radius: 10;
+}
+
+ui {
+    border-radius: 4;
+}

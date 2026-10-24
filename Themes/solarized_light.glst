@@ -1,0 +1,138 @@
+/* GLSL Studio Theme — Solarized Light */
+
+editor {
+    bg: #fdf6e3;
+    fg: #657b83;
+    cursor: #586e75;
+    selection: #eee8d5;
+    line-highlight: #eee8d5;
+    font-size: 14;
+    line-height: 20;
+}
+
+gutter {
+    bg: #eee8d5;
+    fg: #93a1a1;
+    border: #ddd6c4;
+    width: 50;
+}
+
+preview {
+    bg: #fdf6e3;
+    border: #ddd6c4;
+}
+
+toolbar {
+    bg: #eee8d5;
+    fg: #657b83;
+    border: #ddd6c4;
+    height: 30;
+}
+
+status {
+    bg: #eee8d5;
+    fg: #657b83;
+    error: #dc322f;
+    success: #859900;
+    height: 24;
+}
+
+scrollbar {
+    bg: #fdf6e3;
+    thumb: #ddd6c4;
+    width: 12;
+}
+
+syntax.keyword {
+    color: #859900;
+    bold: true;
+}
+
+syntax.type {
+    color: #268bd2;
+    italic: true;
+}
+
+syntax.number {
+    color: #d33682;
+}
+
+syntax.string {
+    color: #2aa198;
+}
+
+syntax.comment {
+    color: #93a1a1;
+    italic: true;
+}
+
+syntax.function {
+    color: #b58900;
+}
+
+syntax.preprocessor {
+    color: #cb4b16;
+}
+
+syntax.operator {
+    color: #657b83;
+}
+
+syntax.builtin {
+    color: #6c71c4;
+}
+
+syntax.identifier {
+    color: #657b83;
+}
+
+syntax.swizzle {
+    color: #586e75;
+}
+
+tab {
+    bg: #eee8d5;
+    active-bg: #fdf6e3;
+    fg: #93a1a1;
+    active-fg: #657b83;
+    border: #ddd6c4;
+    height: 28;
+}
+
+node {
+    bg: #eee8d5;
+    header: #d6d0b8;
+    fg: #586e75;
+    border: #93a1a1;
+    selection: #b58900;
+    shadow: #000000;
+    grid-bg: #f5efe0;
+    grid-line: #ebe5d4;
+    grid-major: #ddd7c4;
+    border-radius: 6;
+}
+
+menu {
+    bg: #eee8d5;
+    fg: #586e75;
+    hover: #d6d0b8;
+    border: #93a1a1;
+    separator: #ddd7c4;
+    category: #268bd2;
+    shortcut: #93a1a1;
+    shadow: #000000;
+    border-radius: 8;
+}
+
+picker {
+    bg: #fdf6e3;
+    fg: #586e75;
+    hover: #eee8d5;
+    active: #d6d0b8;
+    border: #93a1a1;
+    border-radius: 10;
+}
+
+ui {
+    border-radius: 4;
+}

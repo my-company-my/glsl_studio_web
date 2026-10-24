@@ -1,0 +1,138 @@
+/* GLSL Studio Theme — One Dark */
+
+editor {
+    bg: #282c34;
+    fg: #abb2bf;
+    cursor: #528bff;
+    selection: #3e4451;
+    line-highlight: #2c313c;
+    font-size: 14;
+    line-height: 20;
+}
+
+gutter {
+    bg: #21252b;
+    fg: #5c6370;
+    border: #2c313c;
+    width: 50;
+}
+
+preview {
+    bg: #21252b;
+    border: #2c313c;
+}
+
+toolbar {
+    bg: #21252b;
+    fg: #abb2bf;
+    border: #2c313c;
+    height: 30;
+}
+
+status {
+    bg: #21252b;
+    fg: #abb2bf;
+    error: #e06c75;
+    success: #98c379;
+    height: 24;
+}
+
+scrollbar {
+    bg: #282c34;
+    thumb: #3e4451;
+    width: 12;
+}
+
+syntax.keyword {
+    color: #c678dd;
+    bold: true;
+}
+
+syntax.type {
+    color: #61afef;
+    italic: true;
+}
+
+syntax.number {
+    color: #d19a66;
+}
+
+syntax.string {
+    color: #98c379;
+}
+
+syntax.comment {
+    color: #5c6370;
+    italic: true;
+}
+
+syntax.function {
+    color: #61afef;
+}
+
+syntax.preprocessor {
+    color: #e06c75;
+}
+
+syntax.operator {
+    color: #abb2bf;
+}
+
+syntax.builtin {
+    color: #56b6c2;
+}
+
+syntax.identifier {
+    color: #abb2bf;
+}
+
+syntax.swizzle {
+    color: #e5c07b;
+}
+
+tab {
+    bg: #21252b;
+    active-bg: #282c34;
+    fg: #5c6370;
+    active-fg: #abb2bf;
+    border: #2c313c;
+    height: 28;
+}
+
+node {
+    bg: #353b45;
+    header: #3e4451;
+    fg: #abb2bf;
+    border: #4b5263;
+    selection: #e5c07b;
+    shadow: #000000;
+    grid-bg: #1e2127;
+    grid-line: #252830;
+    grid-major: #2c313a;
+    border-radius: 6;
+}
+
+menu {
+    bg: #2c313a;
+    fg: #abb2bf;
+    hover: #3e4451;
+    border: #4b5263;
+    separator: #353b45;
+    category: #61afef;
+    shortcut: #5c6370;
+    shadow: #000000;
+    border-radius: 8;
+}
+
+picker {
+    bg: #282c34;
+    fg: #abb2bf;
+    hover: #3e4451;
+    active: #353b45;
+    border: #4b5263;
+    border-radius: 10;
+}
+
+ui {
+    border-radius: 4;
+}
