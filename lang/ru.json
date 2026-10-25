@@ -299,5 +299,9 @@
   "slot_desc_remap_x": "Value to remap (vec3). The input signal to scale and offset.",
   "slot_desc_remap_scale": "Scale multiplier (vec3). Multiplied by x before adding offset. Default: vec3(1,1,1).",
   "slot_desc_remap_offset": "Additive offset (vec3). Added after scaling. Default: vec3(0,0,0).",
-  "slot_desc_noise_pos": "Input position (vec3). Usually UV or FragCoord. Different positions produce different noise values."
+  "slot_desc_noise_pos": "Input position (vec3). Usually UV or FragCoord. Different positions produce different noise values.",
+  "button_load": "Открыть",
+  "button_download": "Скачать",
+  "button_themes": "Темы",
+  "button_language": "Язык"
 }

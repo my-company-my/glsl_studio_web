@@ -301,5 +301,9 @@
   "slot_desc_remap_offset": "Additive offset (vec3). Added after scaling. Default: vec3(0,0,0).",
   "slot_desc_noise_pos": "Input position (vec3). Usually UV or FragCoord. Different positions produce different noise values.",
   "node_desc_vec3": "3D-Vektor-Konstante. Verwenden Sie für RGB-Farben, 3D-Richtungen oder beliebige Dreikomponentendaten.",
-  "node_desc_vec4": "4D-Vektor-Konstante. Verwenden Sie für RGBA-Farben oder Vierkomponentendaten."
+  "node_desc_vec4": "4D-Vektor-Konstante. Verwenden Sie für RGBA-Farben oder Vierkomponentendaten.",
+  "button_load": "Laden",
+  "button_download": "Herunterladen",
+  "button_themes": "Designs",
+  "button_language": "Sprache"
 }

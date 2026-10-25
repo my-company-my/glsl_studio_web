@@ -245,7 +245,8 @@ export class MenuSystem {
         const shadow_color = this.theme.vec4(`${tp}.shadow`, [0.0, 0.0, 0.0, 0.5]);
 
         // Sombra
-        this.renderer.draw_rounded_rect(mx + 3, my + 3, mw, mh, border_radius, shadow_color, proj);
+        const sh_off = 3 * this.pixel_ratio;
+        this.renderer.draw_rounded_rect(mx + sh_off, my + sh_off, mw, mh, border_radius, shadow_color, proj);
 
         // Borde
         const bw = 2 * this.pixel_ratio;
@@ -322,10 +323,11 @@ export class MenuSystem {
 
     _compute_width() {
         /** Calcula el ancho del menú basado en el texto más largo de los items */
-        const text_scale = 1.0;
-        const shortcut_scale = 0.75;
+        // Escalas y márgenes en píxeles lógicos (x pixel_ratio para pantallas HiDPI)
+        const text_scale = 1.0 * this.pixel_ratio;
+        const shortcut_scale = 0.75 * this.pixel_ratio;
         const pad_x = 10 + 8;
-        const gap = 16;
+        const gap = 16 * this.pixel_ratio;
         let max_w = 0.0;
 
         for (const item of this._items) {
@@ -482,7 +484,7 @@ export class MenuSystem {
         const available_w = mw - pad_x * 2;
         const max_h = title_h - pad_x;
 
-        let scale = 2.0;
+        let scale = 2.0 * this.pixel_ratio;
         let [text_w, text_h] = this.renderer.measure_text(this.config.title, scale);
         if (text_w > available_w && text_w > 0) scale = Math.min(scale, scale * available_w / text_w);
         if (text_h > max_h && text_h > 0) scale = Math.min(scale, scale * max_h / text_h);
@@ -500,9 +502,10 @@ export class MenuSystem {
 
     _render_items(mx, item_start_y, mw, items_area_h, proj) {
         /** Renderiza los items del menú (con scissor activo) */
-        const item_h = this.config.item_height * this.pixel_ratio;
-        const text_scale = 1.0;
-        const shortcut_scale = 0.75;
+        const pr = this.pixel_ratio;
+        const item_h = this.config.item_height * pr;
+        const text_scale = 1.0 * pr;
+        const shortcut_scale = 0.75 * pr;
         const visible_count = Math.max(1, pyInt(items_area_h / item_h));
 
         const tp = this.config.theme_prefix;
@@ -522,11 +525,11 @@ export class MenuSystem {
             const item = this._items[i];
 
             if (item.separator) {
-                this.renderer.draw_rect(mx + 8, y + item_h / 2 - 0.5, mw - 16, 1, sep_color, proj);
+                this.renderer.draw_rect(mx + 8 * pr, y + item_h / 2 - 0.5 * pr, mw - 16 * pr, 1 * pr, sep_color, proj);
             } else if (item.category) {
                 const cat_scale = text_scale * 0.85;
                 const cty = this.renderer.text_centered_y(y, item_h, cat_scale);
-                this.renderer.draw_text(mx + 8, cty, item.label, category_color, proj, cat_scale);
+                this.renderer.draw_text(mx + 8 * pr, cty, item.label, category_color, proj, cat_scale);
             } else {
                 const is_hover = i === this._hover_idx;
 
@@ -538,7 +541,7 @@ export class MenuSystem {
 
                 if (!custom_handled) {
                     if (is_hover) {
-                        this.renderer.draw_rounded_rect(mx + 4, y + 1, mw - 8, item_h - 2,
+                        this.renderer.draw_rounded_rect(mx + 4 * pr, y + 1 * pr, mw - 8 * pr, item_h - 2 * pr,
                                                         border_radius * 0.5, hover_color, proj);
                     }
 
@@ -547,12 +550,12 @@ export class MenuSystem {
 
                     const text = marker + item.label;
                     const ty = this.renderer.text_centered_y(y, item_h, text_scale);
-                    this.renderer.draw_text(mx + 10, ty, text, fg_color, proj, text_scale);
+                    this.renderer.draw_text(mx + 10 * pr, ty, text, fg_color, proj, text_scale);
 
                     if (item.shortcut) {
                         const [shortcut_w] = this.renderer.measure_text(item.shortcut, shortcut_scale);
                         const sty = this.renderer.text_centered_y(y, item_h, shortcut_scale);
-                        this.renderer.draw_text(mx + mw - 8 - shortcut_w, sty,
+                        this.renderer.draw_text(mx + mw - 8 * pr - shortcut_w, sty,
                                                 item.shortcut, shortcut_color, proj, shortcut_scale);
                     }
                 }

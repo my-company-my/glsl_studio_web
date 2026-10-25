@@ -299,5 +299,9 @@
   "props_slot_default": "Default",
   "props_no_desc": "No description available.",
   "props_close_hint": "Esc to close",
-  "decompile_error": "Cannot convert to nodes: unsupported GLSL syntax"
+  "decompile_error": "Cannot convert to nodes: unsupported GLSL syntax",
+  "button_load": "Load",
+  "button_download": "Download",
+  "button_themes": "Themes",
+  "button_language": "Language"
 }

@@ -33,6 +33,8 @@ class Platform {
         this._in_copy_key = false;
         this._paste_text = null;     // texto del evento paste en curso
         this._last_copied = "";      // respaldo si no se puede leer el portapapeles
+        this.is_mac = IS_MAC;        // atajos con Cmd (Mac/iPad) o Ctrl
+        this.touch_input = false;    // el último puntero fue un dedo (sin hover)
     }
 
     get_framebuffer_size() {
@@ -186,15 +188,36 @@ function install_input(app, platform) {
     ]);
 
     let paste_mods = 0;
+    let copy_from_key = false; // el evento copy/cut viene de nuestro Cmd+C/X
     let paste_action = glfw.PRESS;
 
+    // El textarea siempre queda con " " seleccionado (así Retroceso y los
+    // botones Copiar/Cortar del teclado en pantalla siempre tienen algo).
+    // Con execCommand el cambio entra al historial nativo: así el iPad activa
+    // sus botones Deshacer/Rehacer (llegan como input historyUndo/historyRedo).
+    let resetting = false;
     const reset_ime = () => {
-        ime.value = " ";
-        ime.setSelectionRange(0, 1);
+        resetting = true;
+        try {
+            let ok = false;
+            if (document.activeElement === ime && ime.value !== " ") {
+                ime.select();
+                try {
+                    ok = document.execCommand("insertText", false, " ");
+                } catch (e) {
+                    ok = false;
+                }
+            }
+            if (!ok || ime.value !== " ") ime.value = " ";
+            ime.setSelectionRange(0, 1);
+        } finally {
+            resetting = false;
+        }
     };
     reset_ime();
 
     ime.addEventListener("keydown", (e) => {
+        copy_from_key = false;
         if (e.isComposing || e.keyCode === 229) return; // IME: llega por composition/input
         const key = glfw.CODE_TO_KEY[e.code] ?? glfw.KEY_UNKNOWN;
         const mods = glfw.mods_of(e);
@@ -210,6 +233,7 @@ function install_input(app, platform) {
             } finally {
                 platform._in_copy_key = false;
             }
+            copy_from_key = true;
             return; // sin preventDefault: el navegador lanza el evento copy/cut
         }
 
@@ -234,21 +258,28 @@ function install_input(app, platform) {
         app._on_key(key, 0, glfw.RELEASE, glfw.mods_of(e));
     });
 
-    ime.addEventListener("copy", (e) => {
+    // Copiar/cortar sin Cmd+C/X (botones del teclado en pantalla, menú del
+    // navegador): App decide el texto aquí mismo
+    const on_copy_cut = (e, key) => {
         e.preventDefault();
+        if (!copy_from_key) {
+            platform._in_copy_key = true;
+            platform._pending_copy = null;
+            try {
+                app._on_key(key, 0, glfw.PRESS, IS_MAC ? glfw.MOD_SUPER : glfw.MOD_CONTROL);
+                app._on_key(key, 0, glfw.RELEASE, 0);
+            } finally {
+                platform._in_copy_key = false;
+            }
+        }
+        copy_from_key = false;
         if (platform._pending_copy !== null) {
             e.clipboardData.setData("text/plain", platform._pending_copy);
             platform._pending_copy = null;
         }
-    });
-
-    ime.addEventListener("cut", (e) => {
-        e.preventDefault();
-        if (platform._pending_copy !== null) {
-            e.clipboardData.setData("text/plain", platform._pending_copy);
-            platform._pending_copy = null;
-        }
-    });
+    };
+    ime.addEventListener("copy", (e) => on_copy_cut(e, glfw.KEY_C));
+    ime.addEventListener("cut", (e) => on_copy_cut(e, glfw.KEY_X));
 
     ime.addEventListener("paste", (e) => {
         e.preventDefault();
@@ -275,8 +306,16 @@ function install_input(app, platform) {
     });
 
     ime.addEventListener("input", (e) => {
-        if (composing || e.isComposing) return;
+        if (resetting || composing || e.isComposing) return;
         const t = e.inputType;
+        // Deshacer/Rehacer del teclado en pantalla (iPad). No se resetea el
+        // textarea para que el navegador conserve su Rehacer.
+        if (t === "historyUndo" || t === "historyRedo") {
+            const mods = (IS_MAC ? glfw.MOD_SUPER : glfw.MOD_CONTROL) | (t === "historyRedo" ? glfw.MOD_SHIFT : 0);
+            app._on_key(glfw.KEY_Z, 0, glfw.PRESS, mods);
+            app._on_key(glfw.KEY_Z, 0, glfw.RELEASE, 0);
+            return;
+        }
         if (t === "insertText" || t === "insertReplacementText") {
             if (e.data) send_text(e.data);
         } else if (t === "insertLineBreak" || t === "insertParagraph") {
@@ -301,6 +340,7 @@ function install_input(app, platform) {
     canvas.addEventListener("pointerdown", (e) => {
         if (e.pointerType === "touch") return touch_down(e);
         e.preventDefault();
+        platform.touch_input = false;
         if (ime.inputMode === "none") ime.inputMode = ""; // mouse: modo normal
         ime.focus({ preventScroll: true });
         canvas.setPointerCapture(e.pointerId);
@@ -311,6 +351,7 @@ function install_input(app, platform) {
 
     canvas.addEventListener("pointermove", (e) => {
         if (e.pointerType === "touch") return touch_move(e);
+        platform.touch_input = false;
         const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
         for (const ev of (events.length ? events : [e])) {
             const [x, y] = pos_of(ev);
@@ -364,8 +405,7 @@ function install_input(app, platform) {
     // Teclado en pantalla solo al tocar el editor de texto. El textarea no
     // pierde el foco (inputmode="none") para que un teclado físico siga
     // funcionando en pantallas táctiles (atajos, F1/F2, Supr...).
-    const set_virtual_keyboard = (show) => {
-        const mode = show ? "text" : "none";
+    const set_virtual_keyboard = (mode) => {
         if (ime.inputMode !== mode) {
             ime.inputMode = mode;
             ime.blur(); // al volver a enfocar el navegador aplica el nuevo modo
@@ -373,14 +413,53 @@ function install_input(app, platform) {
         ime.focus({ preventScroll: true });
     };
 
+    // Después de un toque: barra superior = el teclado queda igual; editar un
+    // valor del panel de parámetros = teclado numérico; editor de texto =
+    // teclado normal; lo demás = sin teclado.
+    const keyboard_after_tap = (x, y) => {
+        const pr = app.pixel_ratio;
+        if (y * pr < app._toolbar_height()) return;
+        if (app.mode === MODE_NODES && app.node_view.panel_edit_idx >= 0) set_virtual_keyboard("decimal");
+        else set_virtual_keyboard(app.mode === MODE_TEXT && editor_area_hit(x, y) ? "text" : "none");
+    };
+
+    // Al terminar de editar un valor (Enter, Esc...) se cierra el teclado numérico
+    const close_decimal_keyboard = () => {
+        if (ime.inputMode === "decimal" && app.node_view.panel_edit_idx < 0) set_virtual_keyboard("none");
+    };
+    ime.addEventListener("keyup", close_decimal_keyboard);
+    ime.addEventListener("input", close_decimal_keyboard);
+
+    // Menú abierto bajo el punto (px del framebuffer), para el scroll con el dedo
+    const menu_at = (px, py) => {
+        const nv = app.node_view;
+        const menus = [app.theme_picker, app.language_picker];
+        if (app.mode === MODE_NODES) {
+            if (nv.props_open) menus.push(nv.props_menu_system);
+            menus.push(nv.menu_system);
+        }
+        for (const m of menus) {
+            if (!m.is_open()) continue;
+            const [mx, my, mw, mh] = m._calculate_rect();
+            if (mx <= px && px <= mx + mw && my <= py && py <= my + mh) return m;
+        }
+        return null;
+    };
+
     function touch_down(e) {
         e.preventDefault();
         canvas.setPointerCapture(e.pointerId);
         const [x, y] = pos_of(e);
         touches.set(e.pointerId, { x, y });
+        platform.touch_input = true;
 
         if (touches.size === 1) {
-            one = { id: e.pointerId, sx: x, sy: y, started: false, long: false, timer: null };
+            const pr = app.pixel_ratio;
+            const menu = menu_at(x * pr, y * pr);
+            one = { id: e.pointerId, sx: x, sy: y, started: false, long: false, timer: null,
+                    menu, last_y: y, scroll_acc: 0 };
+            // Dentro de un menú: arrastrar = scroll, tocar = elegir, mantener = nada
+            if (menu) return;
             one.timer = setTimeout(() => {
                 if (!one || one.started) return;
                 one.long = true;
@@ -391,7 +470,7 @@ function install_input(app, platform) {
         } else if (touches.size === 2) {
             if (one) {
                 clearTimeout(one.timer);
-                if (one.started) app._on_mouse_button(glfw.MOUSE_BUTTON_LEFT, glfw.RELEASE, 0);
+                if (one.started && !one.menu) app._on_mouse_button(glfw.MOUSE_BUTTON_LEFT, glfw.RELEASE, 0);
                 one = null;
             }
             const [a, b] = [...touches.values()];
@@ -435,6 +514,22 @@ function install_input(app, platform) {
             return;
         }
 
+        if (one && one.id === e.pointerId && one.menu) {
+            if (!one.started && Math.hypot(x - one.sx, y - one.sy) > MOVE_TOL) one.started = true;
+            if (one.started) {
+                const m = one.menu;
+                const item_h = m.config.item_height * m.pixel_ratio;
+                one.scroll_acc += (y - one.last_y) * app.pixel_ratio;
+                const lines = Math.trunc(one.scroll_acc / item_h);
+                if (lines) {
+                    m.on_scroll(lines);
+                    one.scroll_acc -= lines * item_h;
+                }
+            }
+            one.last_y = y;
+            return;
+        }
+
         if (one && one.id === e.pointerId && !one.long) {
             if (!one.started && Math.hypot(x - one.sx, y - one.sy) > MOVE_TOL) {
                 clearTimeout(one.timer);
@@ -451,7 +546,16 @@ function install_input(app, platform) {
         touches.delete(e.pointerId);
         const [x, y] = pos_of(e);
 
-        if (one && one.id === e.pointerId) {
+        if (one && one.id === e.pointerId && one.menu) {
+            // Toque sin arrastrar dentro del menú = clic (elige el item)
+            if (!one.started && !cancelled) {
+                set_cursor(x, y);
+                app._on_mouse_button(glfw.MOUSE_BUTTON_LEFT, glfw.PRESS, 0);
+                app._on_mouse_button(glfw.MOUSE_BUTTON_LEFT, glfw.RELEASE, 0);
+                keyboard_after_tap(x, y);
+            }
+            one = null;
+        } else if (one && one.id === e.pointerId) {
             clearTimeout(one.timer);
             if (!one.long && !cancelled) {
                 if (!one.started) {
@@ -459,7 +563,7 @@ function install_input(app, platform) {
                     set_cursor(x, y);
                     app._on_mouse_button(glfw.MOUSE_BUTTON_LEFT, glfw.PRESS, 0);
                     app._on_mouse_button(glfw.MOUSE_BUTTON_LEFT, glfw.RELEASE, 0);
-                    set_virtual_keyboard(app.mode === MODE_TEXT && editor_area_hit(x, y));
+                    keyboard_after_tap(x, y);
                 } else {
                     set_cursor(x, y);
                     app._on_mouse_button(glfw.MOUSE_BUTTON_LEFT, glfw.RELEASE, 0);

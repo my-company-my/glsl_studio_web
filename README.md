@@ -60,7 +60,13 @@ En el editor de nodos:
 | `Espacio` | Play/pausa del video |
 | `Esc` | Cerrar menú/panel, quitar selección y resaltado |
 
-Pantallas táctiles: tocar = clic, mantener = clic derecho, dos dedos = mover/zoom (nodos) o scroll (texto). El teclado en pantalla solo aparece al tocar el editor de texto.
+### Botones y pantallas táctiles
+
+- La barra superior tiene botones con su atajo: Guardar, Cargar, Descargar, Exportar, Temas e Idioma; en modo código también Deshacer, Rehacer, Copiar, Cortar, Pegar y Seleccionar todo. Si no caben, el texto se achica.
+- Tocar = clic, mantener = clic derecho, dos dedos = mover/zoom (nodos) o scroll (texto).
+- En los menús: arrastrar con un dedo = scroll, tocar = elegir.
+- Panel de exportar: botones − / + en cada campo; tocar fuera del panel lo cierra.
+- El teclado en pantalla aparece al tocar el editor de texto, y el numérico al editar un valor del panel de parámetros. Los botones Deshacer/Rehacer/Copiar/Cortar/Pegar del teclado del iPad funcionan en el editor.
 
 ### Archivos
 
@@ -168,7 +174,13 @@ In the node editor:
 | `Space` | Play/pause video |
 | `Esc` | Close menu/panel, clear selection and highlight |
 
-Touch screens: tap = click, long press = right click, two fingers = pan/zoom (nodes) or scroll (text). The on-screen keyboard only shows when you tap the text editor.
+### Buttons and touch screens
+
+- The top bar has buttons with their shortcut: Save, Load, Download, Export, Themes and Language; in code mode also Undo, Redo, Copy, Cut, Paste and Select all. If they do not fit, the text gets smaller.
+- Tap = click, long press = right click, two fingers = pan/zoom (nodes) or scroll (text).
+- In menus: drag with one finger = scroll, tap = choose.
+- Export panel: − / + buttons on each field; tap outside the panel to close it.
+- The on-screen keyboard shows when you tap the text editor, and the numeric one when you edit a value in the parameter panel. The iPad keyboard's Undo/Redo/Copy/Cut/Paste buttons work in the editor.
 
 ### Files
 

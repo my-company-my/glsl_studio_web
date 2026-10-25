@@ -6,7 +6,7 @@ import { MenuSystem, MenuConfig, MenuItem } from "./menu_system.js";
 import { _ } from "./lang.js";
 import {
     NodeInstance, LinkInstance, GraphCompiler, GraphDecompiler,
-    NODE_REGISTRY, NODE_W, NODE_H_HEADER, NODE_H_SLOT, NODE_SLOT_RADIUS,
+    NODE_REGISTRY, NODE_W, NODE_H_HEADER, NODE_H_SLOT, NODE_H_DESC, NODE_SLOT_RADIUS,
     SLOT_COLORS, get_node_menu, get_localized_node_name, get_localized_category_name,
 } from "./nodes.js";
 import {
@@ -1343,7 +1343,8 @@ export class NodeEditorView {
         const sel_col = this._tv4("node.selection", SELECTION_COLOR);
 
         // Sombra
-        r.draw_rounded_rect(sx + 3, sy + 3, sw, sh, node_radius, shadow_col, proj);
+        const sh_off = 3 * pixel_ratio;
+        r.draw_rounded_rect(sx + sh_off, sy + sh_off, sw, sh, node_radius, shadow_col, proj);
 
         // Cuerpo
         const body_color = [nd.color[0] * 0.7, nd.color[1] * 0.7, nd.color[2] * 0.7, 0.95];
@@ -1367,8 +1368,10 @@ export class NodeEditorView {
         r.draw_text(sx + 6 * this.zoom, r.text_centered_y(sy, hh, text_scale),
                     localized_title, [1.0, 1.0, 1.0, 1.0], proj, text_scale);
 
-        // Contenido descriptivo del nodo
-        const content_y = sy + hh + 8 * this.zoom;
+        // Contenido descriptivo del nodo (fila propia debajo de los slots)
+        const n_slots = Math.max(nd.inputs.length, nd.outputs.length, 1);
+        const desc_y = sy + hh + n_slots * slot_h;
+        const content_y = r.text_centered_y(desc_y, NODE_H_DESC * this.zoom, text_scale * 0.8);
         const content_color = [0.9, 0.9, 0.95, 0.8];
         const cx = sx + 8 * this.zoom;
         const cs = text_scale * 0.8;
@@ -2040,7 +2043,7 @@ export class NodeEditorView {
         /** Polilínea ortogonal con esquinas redondeadas (coords de pantalla). */
         if (waypoints.length < 2) return;
 
-        const CORNER_R = Math.min(thickness * 4, 10.0);
+        const CORNER_R = Math.min(thickness * 4, 10.0 * this._pixel_ratio); // radio de curva en esquinas
 
         // Expandir waypoints a puntos de curva (insertar puntos de tangencia)
         const pts = [];

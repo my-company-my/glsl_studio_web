@@ -29,6 +29,7 @@ export const SLOT_COLORS = {
 export const NODE_W = 160;
 export const NODE_H_HEADER = 24;
 export const NODE_H_SLOT = 22;
+export const NODE_H_DESC = NODE_H_SLOT; // fila de la descripción, debajo de los slots
 export const NODE_SLOT_RADIUS = 9;
 export const NODE_ROUND = 4;
 
@@ -93,7 +94,7 @@ export class NodeDef {
 
     height() {
         const slots = Math.max(this.inputs.length, this.outputs.length);
-        return NODE_H_HEADER + Math.max(slots, 1) * NODE_H_SLOT + 8;
+        return NODE_H_HEADER + Math.max(slots, 1) * NODE_H_SLOT + NODE_H_DESC + 8;
     }
 }
 
@@ -1254,7 +1255,9 @@ export class GraphDecompiler {
         }
 
         const LAYOUT_X_STEP = 240;
-        const LAYOUT_Y_STEP = 130;
+        // Espacio vertical entre nodos de una columna (un nodo de 2 slots,
+        // 98 de alto, queda a 130 del siguiente)
+        const LAYOUT_Y_GAP = 32;
         const LAYOUT_START_X = 0;
         const LAYOUT_START_Y = 0;
 
@@ -1291,14 +1294,18 @@ export class GraphDecompiler {
             keyed.sort((a, b) => a[0] - b[0]);
             const sorted_place = keyed.map((k) => k[1]);
 
-            // Colocar en Y preferida, empujando hacia abajo si hay solape.
+            // Colocar en Y preferida, empujando hacia abajo si hay solape
+            // con el nodo anterior (según su altura real).
             const placed_ys = [];
+            let prev_h = 0;
             for (const nid of sorted_place) {
                 let py = preferred_y(nid);
-                if (placed_ys.length && py < placed_ys[placed_ys.length - 1] + LAYOUT_Y_STEP) {
-                    py = placed_ys[placed_ys.length - 1] + LAYOUT_Y_STEP;
+                if (placed_ys.length && py < placed_ys[placed_ys.length - 1] + prev_h + LAYOUT_Y_GAP) {
+                    py = placed_ys[placed_ys.length - 1] + prev_h + LAYOUT_Y_GAP;
                 }
                 placed_ys.push(py);
+                const nd = NODE_REGISTRY.get(parsed_nodes.get(nid)[0]);
+                prev_h = nd ? nd.height() : 50;
             }
 
             // Recentrar la columna en el promedio de las Y preferidas

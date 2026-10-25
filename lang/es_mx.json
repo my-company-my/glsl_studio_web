@@ -299,5 +299,9 @@
   "props_slot_default": "Por defecto",
   "props_no_desc": "Sin descripción disponible.",
   "props_close_hint": "Esc para cerrar",
-  "decompile_error": "No se puede convertir a nodos: sintaxis GLSL no soportada"
+  "decompile_error": "No se puede convertir a nodos: sintaxis GLSL no soportada",
+  "button_load": "Cargar",
+  "button_download": "Descargar",
+  "button_themes": "Temas",
+  "button_language": "Idioma"
 }

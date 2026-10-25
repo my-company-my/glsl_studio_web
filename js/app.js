@@ -203,6 +203,12 @@ export class App {
         this._export_msg = "";
         this._export_msg_time = 0.0;
         this._exporting = false; // bloquea la entrada mientras se exporta
+
+        // Botones de la barra (web)
+        this._toolbar_cache = null;
+        this._toolbar_flash = -1;       // botón recién presionado
+        this._toolbar_flash_time = 0.0;
+        this._clipboard_override = null;
     }
 
     // --- Inicialización ---
@@ -365,11 +371,133 @@ export class App {
     // --- Portapapeles ---
 
     _clipboard_get() {
+        // Pegar desde el botón de la barra: el texto ya se leyó del portapapeles
+        if (this._clipboard_override !== null) return this._clipboard_override;
         return this.platform.clipboard_get() || "";
     }
 
     _clipboard_set(text) {
         this.platform.clipboard_set(text);
+    }
+
+    // --- Botones de la barra superior (solo web) ---
+
+    _toolbar_buttons() {
+        /** [acción, texto] de cada botón, con el atajo según el sistema. */
+        const mac = this.platform.is_mac;
+        const c = mac ? "Cmd" : "Ctrl";
+        const buttons = [
+            ["save", `${_("action_save")} (${c}+S)`],
+            ["load", `${_("button_load")} (${c}+L)`],
+            ["download", `${_("button_download")} (${c}+Shift+S)`],
+            ["export", `${_("export_button")} (${c}+E)`],
+            ["themes", `${_("button_themes")} (Alt+T)`],
+            ["language", `${_("button_language")} (${c}+Shift+L)`],
+        ];
+        if (this.mode === MODE_TEXT) {
+            buttons.push(
+                ["undo", `${_("action_undo")} (${c}+Z)`],
+                ["redo", `${_("action_redo")} (${mac ? "Cmd+Shift+Z" : "Ctrl+Y"})`],
+                ["copy", `${_("action_copy")} (${c}+C)`],
+                ["cut", `${_("action_cut")} (${c}+X)`],
+                ["paste", `${_("action_paste")} (${c}+V)`],
+                ["select_all", `${_("action_select_all")} (${c}+A)`],
+            );
+        }
+        return buttons;
+    }
+
+    _toolbar_layout() {
+        /**
+         * Botones de la barra en px del framebuffer, alineados a la derecha.
+         * Si no caben, el texto se achica (en pasos de 1/32 para no crear un
+         * atlas de glifos por cada tamaño).
+         */
+        const r = this.renderer;
+        const pr = this.pixel_ratio;
+        const th = this._toolbar_height();
+        const scale = this.font_scale * pr;
+        const buttons = this._toolbar_buttons();
+        const key = [this.fb_width, th, scale, ...buttons.map((b) => b[1])].join("\u0000");
+        if (this._toolbar_cache && this._toolbar_cache.key === key) return this._toolbar_cache;
+
+        const margin = 10 * pr;
+        const pad_x = 8 * pr;
+        const gap = 6 * pr;
+        const [title_w] = r.measure_text("GLSL Studio", scale);
+        const avail = this.fb_width - margin - (margin + title_w + 16 * pr);
+        const for_text = avail - buttons.length * pad_x * 2 - (buttons.length - 1) * gap;
+
+        const base = scale * 0.75; // tamaño de los atajos de escritorio
+        let k = 1.0;
+        let widths = buttons.map(([, t]) => r.measure_text(t, base)[0]);
+        for (let i = 0; i < 8; i++) {
+            const total = widths.reduce((acc, w) => acc + w, 0);
+            if (total <= for_text || total <= 0 || k <= 1 / 32) break;
+            k = Math.max(1 / 32, Math.floor(k * Math.max(0, for_text) / total * 32) / 32);
+            widths = buttons.map(([, t]) => r.measure_text(t, base * k)[0]);
+        }
+
+        const y = 3 * pr;
+        const h = th - 6 * pr;
+        const items = [];
+        let x = this.fb_width - margin;
+        for (let i = buttons.length - 1; i >= 0; i--) {
+            const w = widths[i] + pad_x * 2;
+            x -= w;
+            items.unshift({ action: buttons[i][0], text: buttons[i][1], x, y, w, h });
+            x -= gap;
+        }
+        this._toolbar_cache = { key, items, text_scale: base * k, pad_x, gap, th };
+        return this._toolbar_cache;
+    }
+
+    _toolbar_hit(px, py) {
+        /** Índice del botón bajo (px, py); el área táctil incluye media separación y toda la altura. */
+        const lay = this._toolbar_layout();
+        if (py < 0 || py >= lay.th) return -1;
+        for (let i = 0; i < lay.items.length; i++) {
+            const b = lay.items[i];
+            if (b.x - lay.gap / 2 <= px && px < b.x + b.w + lay.gap / 2) return i;
+        }
+        return -1;
+    }
+
+    _press_key(key, mods) {
+        /** Atajo de teclado completo (presionar + soltar), para los botones. */
+        this._on_key(key, 0, glfw.PRESS, mods);
+        this._on_key(key, 0, glfw.RELEASE, 0);
+    }
+
+    _toolbar_action(action) {
+        const cmd = this.platform.is_mac ? glfw.MOD_SUPER : glfw.MOD_CONTROL;
+        const shift = glfw.MOD_SHIFT;
+        switch (action) {
+            case "save": this._press_key(glfw.KEY_S, cmd); break;
+            case "load": this._press_key(glfw.KEY_L, cmd); break;
+            case "download": this._press_key(glfw.KEY_S, cmd | shift); break;
+            case "export": this._press_key(glfw.KEY_E, cmd); break;
+            case "themes": this._press_key(glfw.KEY_T, glfw.MOD_ALT); break;
+            case "language": this._press_key(glfw.KEY_L, cmd | shift); break;
+            case "undo": this._press_key(glfw.KEY_Z, cmd); break;
+            case "redo": this._press_key(glfw.KEY_Z, cmd | shift); break;
+            case "copy": this._press_key(glfw.KEY_C, cmd); break;
+            case "cut": this._press_key(glfw.KEY_X, cmd); break;
+            case "select_all": this._press_key(glfw.KEY_A, cmd); break;
+            case "paste": this._toolbar_paste(cmd); break;
+        }
+    }
+
+    async _toolbar_paste(cmd) {
+        // readText se llama dentro del evento del clic (los navegadores lo exigen)
+        const text = await this.platform.clipboard_read_async();
+        if (!text || this.mode !== MODE_TEXT) return;
+        this._clipboard_override = text;
+        try {
+            this._press_key(glfw.KEY_V, cmd);
+        } finally {
+            this._clipboard_override = null;
+        }
     }
 
     // --- Menu System Callbacks ---
@@ -754,10 +882,14 @@ export class App {
         if (cmd && key === glfw.KEY_Z) {
             if (this._shift_held) ed.redo();
             else ed.undo();
+            this._last_edit_time = monotonic();
+            this._pending_compile = true;
             return;
         }
         if (cmd && key === glfw.KEY_Y) {
             ed.redo();
+            this._last_edit_time = monotonic();
+            this._pending_compile = true;
             return;
         }
         if (cmd && key === glfw.KEY_A) {
@@ -771,7 +903,11 @@ export class App {
         }
         if (cmd && key === glfw.KEY_X) {
             const text = ed.cut();
-            if (text) this._clipboard_set(text);
+            if (text) {
+                this._clipboard_set(text);
+                this._last_edit_time = monotonic();
+                this._pending_compile = true;
+            }
             return;
         }
         if (cmd && key === glfw.KEY_V) {
@@ -891,6 +1027,8 @@ export class App {
 
         // Theme picker interaction
         if (this.theme_picker.is_open()) {
+            // Web: el botón de la barra lo abre al presionar; al soltarlo no se cierra
+            if (action !== glfw.PRESS) return;
             if (this.theme_picker.on_mouse_button(px, py, button, action)) return;
             this.theme_picker.close();
             return;
@@ -898,13 +1036,28 @@ export class App {
 
         // Language picker interaction
         if (this.language_picker.is_open()) {
+            if (action !== glfw.PRESS) return;
             if (this.language_picker.on_mouse_button(px, py, button, action)) return;
             this.language_picker.close();
             return;
         }
 
-        // Export panel blocks interaction
-        if (this._export_open) return;
+        // Panel de exportación: bloquea lo demás; en web se usa con clic/toque
+        if (this._export_open) {
+            if (action === glfw.PRESS && button === glfw.MOUSE_BUTTON_LEFT) this._export_on_click(px, py);
+            return;
+        }
+
+        // Botones de la barra (web)
+        if (action === glfw.PRESS && button === glfw.MOUSE_BUTTON_LEFT) {
+            const hit = this._toolbar_hit(px, py);
+            if (hit >= 0) {
+                this._toolbar_flash = hit;
+                this._toolbar_flash_time = monotonic();
+                this._toolbar_action(this._toolbar_layout().items[hit].action);
+                return;
+            }
+        }
 
         // Click en tabs
         if (action === glfw.PRESS && button === glfw.MOUSE_BUTTON_LEFT) {
@@ -1150,9 +1303,12 @@ export class App {
         const shift = (mods & glfw.MOD_SHIFT) !== 0;
         if (key !== glfw.KEY_LEFT && key !== glfw.KEY_RIGHT) return false;
 
-        const d = key === glfw.KEY_RIGHT ? 1 : -1;
-        const fkey = fields[this._export_cursor][0];
+        this._export_step(fields[this._export_cursor][0], key === glfw.KEY_RIGHT ? 1 : -1, shift);
+        return true;
+    }
 
+    _export_step(fkey, d, shift) {
+        /** Cambia un campo del panel un paso (d = -1 o 1; shift = paso grande). */
         if (fkey === "mode") {
             this._export_mode = 1 - this._export_mode;
         } else if (fkey === "width") {
@@ -1170,7 +1326,60 @@ export class App {
         } else if (fkey === "fps") {
             this._export_fps = Math.max(1, Math.min(120, this._export_fps + d * (shift ? 10 : 1)));
         }
-        return true;
+    }
+
+    _export_geom() {
+        /** Geometría del panel de exportación (render y clics usan la misma). */
+        const r = this.renderer;
+        const pr = this.pixel_ratio;
+        const fields = this._export_fields_list();
+        const item_h = 32 * pr;
+        const pad = 16 * pr;
+        const title_h = 40 * pr;
+        const panel_w = 360 * pr;
+        const panel_h = title_h + fields.length * item_h + pad * 2;
+        const cx = (this.fb_width - panel_w) / 2;
+        const cy = (this.fb_height - panel_h) / 2;
+
+        // Web: botones − / + a los lados del valor; el valor va centrado entre ellos
+        const scale = this.font_scale * pr;
+        const bs = item_h - 8 * pr;
+        const gap = 6 * pr;
+        let val_w = 70 * pr;
+        for (const [fkey, , value] of fields) {
+            if (fkey !== "export") val_w = Math.max(val_w, r.measure_text(value, scale * 0.9)[0]);
+        }
+        const plus_x = cx + panel_w - pad - bs;
+        const val_x = plus_x - gap - val_w;
+        const minus_x = val_x - gap - bs;
+
+        const rows = fields.map((f, i) => {
+            const iy = cy + title_h + pad + i * item_h;
+            return { iy, by: iy + (item_h - bs) / 2 };
+        });
+        return { fields, item_h, pad, title_h, panel_w, panel_h, cx, cy, bs, val_x, val_w, plus_x, minus_x, rows };
+    }
+
+    _export_on_click(px, py) {
+        /** Clic/toque en el panel: elegir campo, − / +, exportar; fuera cierra. */
+        const g = this._export_geom();
+        if (!(g.cx <= px && px < g.cx + g.panel_w && g.cy <= py && py < g.cy + g.panel_h)) {
+            this._export_open = false;
+            return;
+        }
+        const i = g.rows.findIndex((row) => row.iy <= py && py < row.iy + g.item_h);
+        if (i < 0) return;
+        this._export_cursor = i;
+        const fkey = g.fields[i][0];
+        if (fkey === "export") {
+            this._do_export();
+            return;
+        }
+        const by = g.rows[i].by;
+        if (by <= py && py < by + g.bs) {
+            if (g.minus_x <= px && px < g.minus_x + g.bs) this._export_step(fkey, -1, false);
+            else if (g.plus_x <= px && px < g.plus_x + g.bs) this._export_step(fkey, 1, false);
+        }
     }
 
     async _do_export() {
@@ -1232,16 +1441,9 @@ export class App {
         if (!r) return;
 
         const pr = this.pixel_ratio;
-        const fields = this._export_fields_list();
-        const item_h = 32 * pr;
-        const pad = 16 * pr;
-        const title_h = 40 * pr;
-        const panel_w = 360 * pr;
-        const panel_h = title_h + fields.length * item_h + pad * 2;
+        const g = this._export_geom();
+        const { fields, item_h, pad, title_h, panel_w, panel_h, cx, cy } = g;
         const border_radius = 10 * pr;
-
-        const cx = (this.fb_width - panel_w) / 2;
-        const cy = (this.fb_height - panel_h) / 2;
 
         // Overlay
         r.draw_rect(0, 0, this.fb_width, this.fb_height, [0.0, 0.0, 0.0, 0.5], proj);
@@ -1251,7 +1453,8 @@ export class App {
         const border_c = this.theme.vec4("picker.border", [0.3, 0.3, 0.4, 1.0]);
         const bg_c = this.theme.vec4("picker.bg", [0.12, 0.12, 0.18, 0.98]);
 
-        r.draw_rounded_rect(cx + 3, cy + 3, panel_w, panel_h, border_radius, shadow_c, proj);
+        const sh_off = 3 * pr;
+        r.draw_rounded_rect(cx + sh_off, cy + sh_off, panel_w, panel_h, border_radius, shadow_c, proj);
         const bw = 2 * pr;
         r.draw_rounded_rect(cx - bw, cy - bw, panel_w + bw * 2, panel_h + bw * 2, border_radius + bw, border_c, proj);
         r.draw_rounded_rect(cx, cy, panel_w, panel_h, border_radius, bg_c, proj);
@@ -1267,14 +1470,14 @@ export class App {
         const fg_c = this.theme.vec4("picker.fg", [0.85, 0.85, 0.9, 1.0]);
         const hover_c = this.theme.vec4("picker.hover", [0.28, 0.35, 0.5, 1.0]);
         const val_c = [0.55, 0.75, 1.0, 1.0];
-        const hint_c = [0.45, 0.45, 0.55, 0.8];
 
+        const btn_c = border_c;
         fields.forEach(([fkey, label, value], i) => {
-            const iy = cy + title_h + pad + i * item_h;
+            const iy = g.rows[i].iy;
 
             // Hover highlight
             if (i === this._export_cursor) {
-                r.draw_rounded_rect(cx + 4, iy + 1, panel_w - 8, item_h - 2, border_radius * 0.4, hover_c, proj);
+                r.draw_rounded_rect(cx + 4 * pr, iy + 1 * pr, panel_w - 8 * pr, item_h - 2 * pr, border_radius * 0.4, hover_c, proj);
             }
 
             if (fkey === "export") {
@@ -1284,16 +1487,15 @@ export class App {
                 r.draw_text(cx + (panel_w - bw2) / 2, iy + (item_h - bh) / 2, btn_text, fg_c, proj, scale);
             } else {
                 // Label on left
-                r.draw_text(cx + pad, iy + 4, label, fg_c, proj, scale * 0.9);
-                // Value on right
+                r.draw_text(cx + pad, iy + 4 * pr, label, fg_c, proj, scale * 0.9);
+                // Web: valor centrado entre los botones − y + (reemplazan la pista "<  >")
                 const [vw] = r.measure_text(value, scale * 0.9);
-                r.draw_text(cx + panel_w - pad - vw, iy + 4, value, val_c, proj, scale * 0.9);
-
-                // Arrow hints for selected field
-                if (i === this._export_cursor) {
-                    const hint = "<  >";
-                    const [hw] = r.measure_text(hint, scale * 0.7);
-                    r.draw_text(cx + panel_w - pad - vw - hw - 8 * pr, iy + 6, hint, hint_c, proj, scale * 0.7);
+                r.draw_text(g.val_x + (g.val_w - vw) / 2, iy + 4 * pr, value, val_c, proj, scale * 0.9);
+                const by = g.rows[i].by;
+                for (const [bx, sym] of [[g.minus_x, "\u2212"], [g.plus_x, "+"]]) {
+                    r.draw_rounded_rect(bx, by, g.bs, g.bs, border_radius * 0.4, btn_c, proj);
+                    const [sw, sh] = r.measure_text(sym, scale);
+                    r.draw_text(bx + (g.bs - sw) / 2, r.text_centered_y(by, g.bs, scale), sym, fg_c, proj, scale);
                 }
             }
         });
@@ -1316,11 +1518,22 @@ export class App {
         const [, title_h] = r.measure_text(title, scale);
         r.draw_text(10 * this.pixel_ratio, (th - title_h) / 2, title, fg, proj, scale);
 
-        // Atajos en la derecha (traducidos). Web: temas con Alt+T
-        const hints = _("hints").replace("Cmd+T", "Alt+T");
-        const [hint_w, hint_h] = r.measure_text(hints, scale * 0.75);
-        r.draw_text(this.fb_width - hint_w - 10 * this.pixel_ratio, (th - hint_h) / 2,
-                    hints, [0.45, 0.45, 0.55, 1.0], proj, scale * 0.75);
+        // Web: botones (texto + atajo) en lugar del texto de atajos
+        const lay = this._toolbar_layout();
+        const btn_bg = this.theme.vec4("menu.bg", [0.15, 0.15, 0.20, 0.98]);
+        const btn_hover = this.theme.vec4("menu.hover", [0.28, 0.35, 0.50, 1.0]);
+        const btn_fg = this.theme.vec4("menu.fg", [0.85, 0.85, 0.90, 1.0]);
+        const [cx, cy] = this.platform.get_cursor_pos();
+        const hover = this.platform.touch_input ? -1 : this._toolbar_hit(cx * this.pixel_ratio, cy * this.pixel_ratio);
+        const flash = monotonic() - this._toolbar_flash_time < 0.15 ? this._toolbar_flash : -1;
+        const modal = this.theme_picker.is_open() || this.language_picker.is_open() || this._export_open;
+        lay.items.forEach((b, i) => {
+            const radius = Math.min(this.theme.integer("menu.border-radius", 8) * this.pixel_ratio * 0.5, b.h / 2);
+            const active = !modal && (i === hover || i === flash);
+            r.draw_rounded_rect(b.x, b.y, b.w, b.h, radius, active ? btn_hover : btn_bg, proj);
+            const ty = r.text_centered_y(b.y, b.h, lay.text_scale);
+            r.draw_text(b.x + lay.pad_x, ty, b.text, btn_fg, proj, lay.text_scale);
+        });
     }
 
     _render_tabs(proj) {

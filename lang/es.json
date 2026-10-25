@@ -301,5 +301,9 @@
   "props_close_hint": "Esc para cerrar",
   "node_desc_vec3": "Vector 3D constante. Úsalo para colores RGB, direcciones 3D o cualquier dato de tres componentes.",
   "node_desc_vec4": "Vector 4D constante. Úsalo para colores RGBA o datos de cuatro componentes.",
-  "decompile_error": "No se puede convertir a nodos: sintaxis GLSL no soportada"
+  "decompile_error": "No se puede convertir a nodos: sintaxis GLSL no soportada",
+  "button_load": "Cargar",
+  "button_download": "Descargar",
+  "button_themes": "Temas",
+  "button_language": "Idioma"
 }
